@@ -1,3 +1,6 @@
+<!--**************************
+erpGroupNew.asp
+****************************-->
 <!--#include file="../lib.inc"-->
 <!--#include file="../defaults.inc"-->
 
@@ -15,8 +18,8 @@ group = CLng(groupString)
 'response.write "course: " & course & " group: " & group' & " id: " & id
 
 'The table "Gruppen" contains only the information which groups exist. 
-'The users are assigned to a certain group by setting the "Custom Values" 
-'of their entry in the "Members" table
+'The users are assigned to a certain group by setting the "Custom1" value
+'of their entry in the "Members" table of the ve-forum 
 
 ' Set rs = Conn.Execute("SELECT Max(id) FROM erp_groups")
 ' id = rs(0) + 1

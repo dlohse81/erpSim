@@ -1,10 +1,13 @@
+<!--**************************
+erpFormularPurchasePieces.asp
+****************************-->
 <% @Language="VBScript" %>
 <html>
 <head>
 	<title>ERP Simulation: Nutzereingaben</title>
 	
 	<!-- #include file="erpClasses.asp" -->
-	<!-- #include file="erpProcedures.asp" -->
+	<!-- #include file="erpTest2.asp" -->
 
 	<!--#include file="../lib.inc"-->
 	<!--#include file="../defaults.inc"-->

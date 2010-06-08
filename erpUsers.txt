@@ -1,0 +1,13 @@
+<course>LRT04</course>
+<group>3</group>
+<user>dlohse81</user>
+<user>JAE08</user>
+
+<course>LRT08</course>
+<group>1</group>
+<user>JAE08</user>
+
+
+<course>LRT08</course>
+<group>2</group>
+<user>Steph</user>

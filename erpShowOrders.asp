@@ -1,156 +1,99 @@
-<% @ Language="VBScript" %>
+<!--***********************
+erpShowResults.asp
+*************************-->
+<% @Language="VBScript" %>
 <html>
 
 <head>
     <title>CeTIM ERP Simulation</title>
-</head>
- 
-<body>
-<!-- #include file="erpClasses.asp" -->
-<!-- #include file="erpProcedures.asp" -->
-<!-- form -->
 
-<!--
-<form method="POST" action="erpUserInputWrite2DB.asp" name="usrInput" id="usrInputForm">
-<h3>Bestellungen von Kaufteilen:</h3>
-<div id="kteilePatternDiv">
--->
-<%
+	<!-- #include file="erpClasses.asp" -->
+	<!-- #include file="erpProcedures.asp" -->
 
-'get usergroup
-set groupObj = New ERPGroup
-call getUsergroup(usergroup, groupObj)
-
-'get game period
-call getPeriod(period)
-
-'initialise DB
-call initDB(Connection)
-
-'initialise KTeile and ETeile
-call initETeile(e1,e2,e3,e4,e5,e6,e7,e8,e9,e10,e11,e12,e13,e14,e15,e16,e17,e18,e19,e140,e150,e160,e180,e190) 'last 5 entries intermediate products of e14,e15,e16,e18,e19
-call initKTeile(k20,k21,k22,k23,k24,k25,k26,k27,k28,k29,k30,k31,k32,k33,k34,k35,k36,k37,k38,k39,k40,k41,k42,k43,k44)
+	<!--#include file="../lib.inc"-->
+	<!--#include file="../defaults.inc"-->
 
 
-response.write "Die folgenden Bestellungen und Arbeitsaufträge wurden von Gruppe " &usergroup& " für die Spielperiode " &period& " erfasst: <br><br>"
+	<%
+	'get usergroup
+	set groupObj = New ERPGroup
+	call getUsergroup(usergroup, groupObj)
 
+	'get game period
+	call getPeriod(period)
 
-'**********************************************************
-'Purchase Pieces (KTeile)
-'**********************************************************
-response.write "<h3>Kaufteilbestellungen</h3>"
+	'initialise DB
+	call initDB(Connection)
 
-sql = "SELECT * FROM Kaufteilbestellungen WHERE usergroup = "&usergroup&" AND Periode = "&period&" AND geliefert = 0 "
-Set Recordset=Server.CreateObject("ADODB.Recordset")	
-Recordset.Open sql, Connection
+	'get formular data
+	resultId = Request.Form("resultId")
+	'response.write "resultId: " & resultId & "<br>"
 
-If Recordset.EOF Then
-	Response.Write("Es sind noch keine Kaufteilbestellungen von Gruppe " &usergroup& " für Spielperiode " &period& "vorhanden.<br>")
-Else	
-	'header
-	response.write "<table>"
-	response.write "<tr>"
-	response.write "<th>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp K-TeilNr &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</th>"
-	response.write "<th>&nbsp&nbsp&nbsp&nbsp Bezeichnung &nbsp&nbsp&nbsp&nbsp</th>"
-	response.write "<th> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Anzahl &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</th>"
-	response.write "</tr>"
-	
-	Do While NOT Recordset.Eof   
-		kteilnr = Recordset("KTeilNr")
-		kteilAmount = Recordset("Anzahl")
-		call setKTeilObject(kteilnr,kteilObject)
-		
-		response.write "<tr>"
-		response.write "<td align='center'>"&kteilnr&"</td>"
-		response.write "<td align='center'>"&kteilObject.name&"</td>"
-		response.write "<td align='center'>"&kteilAmount&"</td>"
-		response.write "</tr>"
-		
-		Recordset.MoveNext
-	Loop
-	
-	response.write "</table>"
-end if
-response.write "<br><br>"
+	sql = "SELECT * FROM Ergebnisse WHERE id="&resultId&" "
+	Set Recordset=Server.CreateObject("ADODB.Recordset")	
+	Recordset.Open sql, Connection
 
-Recordset.close
-set Recordset = Nothing
-
-
-
-
-'********************************************
-'production pieces (ETeile)
-'********************************************
-response.write "<h3>Produktionsaufträge für Eigenfertigunsteile</h3>"
-
-sql = "SELECT * FROM Produktionsauftraege WHERE usergroup = "&usergroup&" AND Periode = "&period&" AND abgeschlossen = 0 ORDER BY Auftragsnr"
-Set Recordset=Server.CreateObject("ADODB.Recordset")	
-Recordset.Open sql, Connection
-
-If Recordset.EOF Then
-	Response.Write("Es sind noch keine Produktionsaufträge von Gruppe " &usergroup& " für Spielperiode " &period& " vorhanden.<br>")
-Else	
-	'header
-	response.write "<table>"
-	response.write "<tr>"
-	response.write "<th>&nbsp&nbsp&nbsp&nbsp AuftragsNr &nbsp&nbsp&nbsp&nbsp</th>"
-	response.write "<th>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp E-TeilNr &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</th>"
-	response.write "<th>&nbsp&nbsp&nbsp&nbsp Bezeichnung &nbsp&nbsp&nbsp&nbsp</th>"
-	response.write "<th> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Losgröße &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</th>"
-	response.write "<th>&nbsp&nbsp&nbsp&nbsp Tag &nbsp&nbsp&nbsp&nbsp</th>"
-	response.write "</tr>"
-	
-	Do While NOT Recordset.Eof   
-		eteilnr = CInt(Recordset("ETeilnr"))
-		if eteilnr = 140 OR eteilnr = 150 OR eteilnr = 160 OR eteilnr = 180 OR eteilnr = 190 then
-			'continue (with next iteration)
-			Recordset.MoveNext
-			set eteilnr = Nothing
-		else
-			Set pOrder = New ProdOrder
-			with pOrder
-				.id = CInt(Recordset("id"))
-				.prodOrderNo = CInt(Recordset("Auftragsnr"))
-				.eteilnr = CInt(Recordset("ETeilnr"))
-				.day  = CInt(Recordset("Tag"))
-				.batchsizeRequired = CInt(Recordset("Losgroesse"))
-				.finished = CInt(Recordset("abgeschlossen")) 'Anzahl der bereits gefertigten Teile vom Vortag, falls Los nicht komplett abgearbeitet werden konnte
-				'.batchsize
-			end with
-				
-			'call setETeilObject(pOrder.eteilnr,eteilObject)
-			call setItemObject(pOrder.eteilnr,eteilObject)
-			
-			response.write "<tr>"
-			response.write "<td align='center'>"&pOrder.prodOrderNo&"</td>"
-			response.write "<td align='center'>"&pOrder.eteilnr&"</td>"
-			response.write "<td align='center'>"&eteilObject.name&"</td>"
-			response.write "<td align='center'>"&pOrder.batchsizeRequired&"</td>"
-			response.write "<td align='center'>"&pOrder.day&"</td>"
-			response.write "</tr>"
-			
-			Recordset.MoveNext
+	'***********************************
+	'iterate through purchase orders
+	'***********************************
+	If Recordset.EOF Then
+		Response.Write("Error in erpShowResults.asp. Das ausgewählte Ergebnis konnte in der Db nicht gefunden werden.<br>")
+	Else
+		htmlCodeUnicode = Recordset("Ergebnis")
+		'response.write "htmlCodeUnicode: " & htmlCodeUnicode & "<br>"
+		if htmlCodeUnicode <>"" then
+			response.write "htmlCodeUnicode received!<br>"
 		end if
-	Loop
-	
-	response.write "</table>"
-end if
+		'Do While NOT Recordset.Eof   
+	end if
+		
+	'clear memory, destroy objects
+	Recordset.close
+	set Recordset = Nothing
+	Connection.close
+	set Connection = Nothing
 
 
-Recordset.close
-set Recordset = Nothing
+	%>
+	<!-- JavaScript functions -->
+	<script type="text/javascript">	
+		function showPage() {
+			//alert("IN");
+			//alert("<%=htmlCodeUnicode%>");
+			var htmlCodeUnicode = "<%=htmlCodeUnicode%>";
+			var htmlCode = decodeURIComponent(htmlCodeUnicode);
+			document.write(htmlCode);
+		}
+		/*
+		function encodeToHex(str){
+			var r="";
+			var e=str.length;
+			var c=0;
+			var h;
+			while(c<e){
+				h=str.charCodeAt(c++).toString(16);
+				while(h.length<3) h="0"+h;
+				r+=h;
+			}
+			return r;
+		}
 
-'close DB connection
-Connection.close
-set Connection = Nothing
-%>
+		function decodeFromHex(str){
+			var r="";
+			var e=str.length;
+			var s;
+			while(e>0){
+				s=e-3;
+				r=String.fromCharCode("0x"+str.substring(s,e))+r;
+				e=s;
+			}
+			return r;
+		}
+		*/
+	</script>
+</head>
 
-<!--
-<input type="submit" value=" Absenden ">
-<input type="reset" value=" Abbrechen">
-</form>
--->
-
+ 
+<body onload='showPage()' style='height:100%'>
 </body>
 </html>

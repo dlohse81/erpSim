@@ -1,3 +1,6 @@
+<!--**************************
+erpGroupsAssignMember.asp 
+****************************-->
 <!--#include file="../lib.inc"-->
 <!--#include file="../defaults.inc"-->
 
@@ -5,11 +8,7 @@
 <!-- #include file="erpProcedures.asp" -->
 <%
 
-' connect to DB
-
-'dim ConnectionVEForum
-'call initDbVEForum(ConnectionVEForum)
-
+' connect to DB (VE-Forum, not erp-mdb)
 Set Conn = Server.CreateObject("ADODB.Connection")
 Conn.Open DB
 
@@ -23,10 +22,8 @@ response.write "groupID: " & groupID & "<br>"
 'get userID from "User" table
 '*****************************
 Set rs = Server.CreateObject("ADODB.Recordset")
-'set rs = Conn.Execute("SELECT IDuser FROM [User] WHERE Alias LIKE '"& userAlias &"'")
 sql = "SELECT IDuser FROM [User] WHERE Alias LIKE '"&userAlias&"'"
 'start query
-'rs.Open sql, ConnectionVEForum
 rs.Open sql, Conn
 'parse results
 If rs.EOF Then
@@ -38,13 +35,16 @@ Else
 	'******************************************************************************************************
 	sqlUpdate = "UPDATE Members SET Custom1 = '"&groupID&"' WHERE IDuser LIKE '"&rs(0)&"' "
 	Conn.Execute(sqlUpdate)
-	'ConnectionVEForum.Execute(sqlUpdate)
-	'Conn.Execute("UPDATE Members SET Custom1 = '" & groupID & "' WHERE IDuser LIKE '"& rs(0) &"' ")
 
+	response.write "rs(0)==IDuser: " & rs(0) & "<br>"
+	
+	'positive feedback
+	response.write "Der Nutzer wurde erfolgreich der gewählten Gruppe zugeordnet.<br><br>"
+	
 	'try to move rs-pointer forward (actually that shouldn't work, there should be only 1 result)
 	rs.MoveNext()
 	Do While NOT rs.Eof
-		response.write "ERROR in erpGroupsAssignMember. sql-query returned more than one result for for a single userId in the VEForum table 'Members'.<br>"
+		response.write "ERROR in erpGroupsAssignMember.asp. sql-query returned more than one result for a single userId in the VEForum table 'Members'.<br>"
 		'fetch next entry
 		rs.MoveNext()
 	Loop
@@ -55,8 +55,6 @@ end if
 rs.close
 set rs = Nothing
 
-'ConnectionVEForum.close
-'set ConnectionVEForum = Nothing
 
 'Response.Clear
 'Response.Redirect("http://ve-forum.org/apps/pubs.asp?Q=3&T=Simulationsprogramm")
@@ -66,8 +64,6 @@ set rs = Nothing
 'Response.Write("<script>window.open('http://ve-forum.org/apps/pubs.asp?Q=3&T=Simulationsprogramm');</script>") 
 'response.write("<script>document.write 'TEST TEST TEST'</script>")
 
-'positive feedback
-response.write "Der Nutzer wurde erfolgreich der gewählten Gruppe zugeordnet.<br><br>"
 
 'Link back to overview
 'response.write "<a href='http://ve-forum.org/apps/pubs.asp?Q=3&T=Simulationsprogramm'>zurück zur Übersicht</a>"

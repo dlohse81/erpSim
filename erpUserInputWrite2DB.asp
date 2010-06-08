@@ -1,3 +1,6 @@
+<!--***********************
+erpUserInputWrite2DB.asp
+*************************-->
 <% 
 @Language="VBScript" 
 %>

@@ -1,3 +1,6 @@
+<!--***********************
+erpInitStock.asp 
+*************************-->
 <% @Language="VBScript" %>
 <html>
 <head>
