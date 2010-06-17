@@ -34,6 +34,7 @@ Else
 	'update entry in "Members" table
 	'******************************************************************************************************
 	sqlUpdate = "UPDATE Members SET Custom1 = '"&groupID&"' WHERE IDuser LIKE '"&rs(0)&"' "
+	'sqlUpdate = "UPDATE Members SET Custom1 = '"&groupID&"' WHERE IDuser LIKE '"&rs(0)&"' AND IDProject = 520 "
 	Conn.Execute(sqlUpdate)
 
 	response.write "rs(0)==IDuser: " & rs(0) & "<br>"

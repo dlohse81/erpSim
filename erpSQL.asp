@@ -1,6 +1,3 @@
-<!--***********************
-erpSQL.asp
-*************************-->
 <html>
 <head>
 	<!-- #include file="erpClasses.asp" -->

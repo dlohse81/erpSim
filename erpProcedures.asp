@@ -338,7 +338,7 @@ sub getUsergroup(usergroup, groupObj)
 				'Note: Apparently this can happen. User 9722 is there currently twice (as he is working for two different projects???) -> now checking for IDProject=520 in SQL-query. NEED TO VERIFY THIS!!!
         Recordset11.MoveNext()
         Do While NOT Recordset11.Eof
-            'response.write "ERROR in getUsergroup(). sql-query returned more than one result for for a single userId in the VEForum table 'Members'.<br>"
+            'response.write "ERROR in erpProcedures.asp -> getUsergroup(). sql-query returned more than one result for a single userId in the VEForum table 'Members'.<br>"
             'fetch next entry
             Recordset11.MoveNext()
         Loop
@@ -366,7 +366,7 @@ sub getUsergroup(usergroup, groupObj)
     'iterate through purchase orders
     '***********************************
     If rs.EOF Then
-        Response.Write("ERROR in erpProcedures 'getUsergroup'. Group "&usergroup&"not found in erpSim.mdb table 'Gruppen'.<br>")
+        Response.Write("ERROR in erpProcedures 'getUsergroup'. Group "&usergroup&" not found in erpSim.mdb table 'Gruppen'.<br>")
     else    
         'assign values to groupObj
         groupObj.id = usergroup ' ==rs(0)
@@ -390,7 +390,32 @@ end sub
 '***********************************************************
 
 sub getPeriod(period)
-    period=1
+    period=2
+         ' 'read current period from period.txt
+	' '*******************************
+	' Dim fso, fsoFile, path
+	' Const ForReading = 1, ForWriting = 2, ForAppending = 8
+	' Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0
+	' path = "D:\Inetpub\VEForum\Apps\erpPeriod.txt"
+
+	' 'create filesystem object
+	' set fso = Server.CreateObject("Scripting.FileSystemObject")
+
+	' If fso.FileExists(path) Then
+		' set fsoFile = fso.OpenTextFile(path, ForReading , false, TristateFalse)
+	' Else
+		' Response.Write("ERROR in erpProcedures.asp. file 'erpPeriod.txt' not found in 'D:\Inetpub\VEForum\Apps\erpPeriod.txt' <br>")
+	' End if
+
+	' 'read period from period.txt
+	' 'Do while not fsoFile.AtEndOfStream
+		' period = fsoFile.ReadLine
+	' 'Loop
+
+	' 'close file, kill objects
+	' fsoFile.close
+	' set fsoFile = nothing
+	' set fso = nothing
 end sub
 
 '***********************************************************
